@@ -11,6 +11,7 @@ data Route
   = Home
   | Game String
   | NotFound
+  | Wow
 
 derive instance genericRoute :: Generic Route _
 derive instance eqRoute :: Eq Route
@@ -20,10 +21,12 @@ instance showRoute :: Show Route where
   show Home = "home"
   show (Game id) = "game " <> id
   show NotFound = "not found "
+  show Wow = "wow "
 
 routeCodec :: RouteDuplex' Route
 routeCodec = root $ sum
   { "Home": noArgs
   , "Game": "game" / string segment
   , "NotFound": "not-found" / noArgs
+  , "Wow": "wow" / noArgs
   }

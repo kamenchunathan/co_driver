@@ -2,11 +2,8 @@ module Component.Router (component, Query(..)) where
 
 import Prelude
 
-import Data.Either (hush)
-import Data.List (index)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.Route (Route(..), routeCodec)
-import Effect.Aff (launchAff_)
+import Data.Route (Route(..))
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (class MonadEffect)
 import Effect.Console (log)
@@ -16,19 +13,9 @@ import Navigate (class Navigate, navigate)
 import Page.Game as GamePage
 import Page.Home as HomePage
 import Page.NotFound as NotFound
-import Routing.Duplex (parse)
-import Routing.Parser as RouteParser
+import Page.Wow as Wow
 import Routing.PushState (PushStateInterface)
-import Routing.Types (RoutePart(..))
 import Type.Proxy (Proxy(..))
-import Web.DOM.Document (toEventTarget)
-import Web.Event.Event (EventType(..), preventDefault, target)
-import Web.Event.EventTarget (addEventListener, eventListener)
-import Web.HTML (window)
-import Web.HTML.HTMLAnchorElement (fromEventTarget, toHTMLHyperlinkElementUtils)
-import Web.HTML.HTMLDocument (toDocument)
-import Web.HTML.HTMLHyperlinkElementUtils (href, pathname)
-import Web.HTML.Window (document)
 
 type AppState =
   { current_route :: Maybe Route
@@ -96,6 +83,7 @@ render :: forall m. MonadAff m => AppState -> H.ComponentHTML Action ChildSlots 
 render st = case fromMaybe NotFound st.current_route of
   Home -> HH.slot (Proxy :: _ "homePage") unit HomePage.component unit HandleHomePageAction
   Game game_id -> HH.slot (Proxy :: _ "gamePage") unit GamePage.component game_id HandleGamePageAction
+  Wow -> Wow.render
   NotFound -> NotFound.render
 
 component :: forall o m. MonadAff m => Navigate m => H.Component Query PushStateInterface o m
