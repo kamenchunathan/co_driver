@@ -35,11 +35,28 @@ render _ = HH.div []
   [ HH.p [] [ HH.text "Home page" ]
   , HH.div
       []
-      [ HH.a
-          [ HP.class_ $ H.ClassName "bg-red-500"
-          , HP.href "/wow"
+      [ HH.p []
+          [ HH.a
+              [ HP.class_ $ H.ClassName "bg-red-500"
+              , HP.href "https://github.com/kamenchunathan/purescript-solitaire"
+              ]
+              [ HH.text "External link" ]
           ]
-          [ HH.text "Push State routing doesn't work with anchor tags" ]
+      , HH.p []
+          [ HH.a
+              [ HP.class_ $ H.ClassName "bg-red-500"
+              , HP.href "/wow"
+              ]
+              [ HH.text "short local link" ]
+          ]
+      , HH.p []
+          [ HH.a
+              [ HP.class_ $ H.ClassName "bg-red-500"
+              , HP.href "http://localhost:5173/wow"
+              ]
+              [ HH.text "long local link" ]
+          ]
+
       ]
   , HH.div
       []
