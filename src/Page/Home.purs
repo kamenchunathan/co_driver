@@ -27,7 +27,6 @@ data PageAction =
 handleAction :: forall m. MonadEffect m => Action -> H.HalogenM State Action () PageAction m Unit
 handleAction = case _ of
   SelectGame e g -> H.raise $ NavigateTo (Game g) e
-
   NoOp -> H.liftEffect $ log "NoOp: Put something here instead"
 
 render :: forall cs m. State -> H.ComponentHTML Action cs m

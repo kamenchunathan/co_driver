@@ -3,6 +3,7 @@
   [ "aff"
   , "console"
   , "effect"
+  , "either"
   , "foreign"
   , "halogen"
   , "lists"

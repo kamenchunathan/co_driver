@@ -5,13 +5,13 @@ import Prelude
 import AppM (runAppM)
 import Component.Router (Query(..))
 import Component.Router as Router
-import Data.Either (Either(..), hush)
+import Data.Either (hush)
 import Data.List (index)
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Route (Route(..), routeCodec)
 import Effect (Effect)
 import Effect.Aff (launchAff_)
-import Effect.Class.Console (log, logShow)
+import Effect.Class.Console (log)
 import Halogen as H
 import Halogen.Aff (awaitBody, runHalogenAff)
 import Halogen.VDom.Driver (runUI)

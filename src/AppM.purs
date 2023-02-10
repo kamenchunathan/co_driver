@@ -6,7 +6,6 @@ import Data.Route (routeCodec)
 import Effect.Aff (Aff)
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (class MonadEffect, liftEffect)
-import Effect.Console (log)
 import Foreign (unsafeToForeign)
 import Navigate (class Navigate)
 import Routing.Duplex (print)
@@ -26,5 +25,4 @@ derive newtype instance monadAffAppM :: MonadAff AppM
 
 instance navigateAppM :: Navigate AppM where
   navigate nav route = liftEffect do
-    log "navigate monad"
     nav.pushState (unsafeToForeign {}) (print routeCodec route)

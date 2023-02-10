@@ -6,7 +6,6 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Route (Route(..))
 import Effect.Aff.Class (class MonadAff)
 import Effect.Class (class MonadEffect)
-import Effect.Console (log)
 import Halogen as H
 import Halogen.HTML as HH
 import Navigate (class Navigate, navigate)
@@ -52,25 +51,17 @@ handleAction
 handleAction = case _ of
   Initialize -> pure unit
   HandleHomePageAction (HomePage.NavigateTo page _) -> do
-    H.liftEffect $ log $ "Router: navigate to " <> show page
     st <- H.get
     when (st.current_route /= Just page) do
-      -- H.modify_ _ { current_route = Just page }
       navigate st.nav page
   HandleGamePageAction (GamePage.NavigateTo page _) -> do
-    H.liftEffect $ log $ "Router: navigate to " <> show page
     st <- H.get
     when (st.current_route /= Just page) do
-      -- H.modify_ _ { current_route = Just page }
       navigate st.nav page
-  HandleGamePageAction (GamePage.PrintState) -> do
-    s <- H.get
-    H.liftEffect $ log $ "printing state" <> (show s.current_route)
 
 handleQuery :: forall a o m. MonadEffect m => Navigate m => Query a -> H.HalogenM AppState Action ChildSlots o m (Maybe a)
 handleQuery = case _ of
   Navigate route a -> do
-    H.liftEffect $ log "Show's about to stop"
     mRoute <- H.gets _.current_route
     when (mRoute /= Just route) $ H.modify_ _ { current_route = Just route }
     pure (Just a)
