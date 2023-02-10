@@ -22,6 +22,9 @@ import Routing.Types (RoutePart(..))
 import Web.Event.Event (EventType(..), preventDefault, target)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.HTML.HTMLAnchorElement (fromEventTarget, toHTMLHyperlinkElementUtils)
+import Web.HTML (window)
+import Web.HTML.Location as Location
+import Web.HTML.Window (location)
 import Web.HTML.HTMLElement (toEventTarget)
 import Web.HTML.HTMLHyperlinkElementUtils (href, pathname)
 
@@ -34,6 +37,9 @@ main = runHalogenAff do
   halogenIO <- runUI rootComponent nav body
 
   H.liftEffect do
+    win <- window
+    loc <- location win
+    pageUri <- Location.href loc
     listener <- eventListener \e -> do
       case (target e) of
         Just t -> do
@@ -41,15 +47,10 @@ main = runHalogenAff do
             Just achorTag -> do
               uri <- href $ toHTMLHyperlinkElementUtils achorTag
               path <- pathname $ toHTMLHyperlinkElementUtils achorTag
-              log $ "link clicked: " <> uri
-              case index (RouteParser.parse identity uri) 2 of
-                Just (Path "localhost:5173") -> do
+              when ((index (RouteParser.parse identity uri) 2) == Just (Path pageUri)) do
                   preventDefault e
                   launchAff_ $ void $ halogenIO.query $ H.mkTell $ LocalLinkClicked $ fromMaybe NotFound $ hush$ parse routeCodec path
-                _ -> pure unit
-
             Nothing -> pure unit
-        -- navigate nav 
         Nothing -> pure unit
 
     addEventListener (EventType "click") listener false (toEventTarget body)
@@ -59,7 +60,6 @@ main = runHalogenAff do
       ( matchesWith
           (parse routeCodec)
           ( \old new -> do
-              H.liftEffect $ log $ "old route: " <> (show old) <> " new route: " <> (show new)
               when (old /= Just new) $ launchAff_ do
                 void $ halogenIO.query $ H.mkTell $ Navigate new
           )
