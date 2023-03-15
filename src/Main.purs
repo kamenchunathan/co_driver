@@ -11,7 +11,6 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Route (Route(..), routeCodec)
 import Effect (Effect)
 import Effect.Aff (launchAff_)
-import Effect.Aff.Compat (EffectFn1, runEffectFn1)
 import Effect.Class.Console (log)
 import Halogen as H
 import Halogen.Aff (awaitBody, runHalogenAff)
@@ -19,7 +18,6 @@ import Halogen.VDom.Driver (runUI)
 import Routing.Duplex (parse)
 import Routing.Parser as RouteParser
 import Routing.PushState (makeInterface, matchesWith)
-import Routing.Types (RoutePart(..))
 import Web.Event.Event (EventType(..), preventDefault, target)
 import Web.Event.EventTarget (addEventListener, eventListener)
 import Web.HTML (window)
@@ -28,11 +26,6 @@ import Web.HTML.HTMLElement (toEventTarget)
 import Web.HTML.HTMLHyperlinkElementUtils (href, pathname)
 import Web.HTML.Location as Location
 import Web.HTML.Window (location)
-
-foreign import _consoleLog :: forall a. EffectFn1 a Unit
-
-consoleLog :: forall a2. a2 -> Effect Unit
-consoleLog = runEffectFn1 _consoleLog
 
 main :: Effect Unit
 main = runHalogenAff do
