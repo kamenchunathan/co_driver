@@ -1,4 +1,4 @@
-module Main where
+module Main (main) where
 
 import Prelude
 
@@ -11,6 +11,7 @@ import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Route (Route(..), routeCodec)
 import Effect (Effect)
 import Effect.Aff (launchAff_)
+import Effect.Aff.Compat (EffectFn1, runEffectFn1)
 import Effect.Class.Console (log)
 import Halogen as H
 import Halogen.Aff (awaitBody, runHalogenAff)
@@ -21,12 +22,17 @@ import Routing.PushState (makeInterface, matchesWith)
 import Routing.Types (RoutePart(..))
 import Web.Event.Event (EventType(..), preventDefault, target)
 import Web.Event.EventTarget (addEventListener, eventListener)
-import Web.HTML.HTMLAnchorElement (fromEventTarget, toHTMLHyperlinkElementUtils)
 import Web.HTML (window)
-import Web.HTML.Location as Location
-import Web.HTML.Window (location)
+import Web.HTML.HTMLAnchorElement (fromEventTarget, toHTMLHyperlinkElementUtils)
 import Web.HTML.HTMLElement (toEventTarget)
 import Web.HTML.HTMLHyperlinkElementUtils (href, pathname)
+import Web.HTML.Location as Location
+import Web.HTML.Window (location)
+
+foreign import _consoleLog :: forall a. EffectFn1 a Unit
+
+consoleLog :: forall a2. a2 -> Effect Unit
+consoleLog = runEffectFn1 _consoleLog
 
 main :: Effect Unit
 main = runHalogenAff do
@@ -42,28 +48,26 @@ main = runHalogenAff do
     pageUri <- Location.href loc
     listener <- eventListener \e -> do
       case (target e) of
-        Just t -> do
+        Just t ->
           case (fromEventTarget t) of
-            Just achorTag -> do
-              uri <- href $ toHTMLHyperlinkElementUtils achorTag
-              path <- pathname $ toHTMLHyperlinkElementUtils achorTag
-              when ((index (RouteParser.parse identity uri) 2) == Just (Path pageUri)) do
-                  preventDefault e
-                  launchAff_ $ void $ halogenIO.query $ H.mkTell $ LocalLinkClicked $ fromMaybe NotFound $ hush$ parse routeCodec path
+            Just anchorTag -> do
+              uri <- href $ toHTMLHyperlinkElementUtils anchorTag
+              path <- pathname $ toHTMLHyperlinkElementUtils anchorTag
+              when ((index (RouteParser.parse identity uri) 2) == (index (RouteParser.parse identity pageUri) 2)) do
+                preventDefault e
+                launchAff_ $ void $ halogenIO.query $ H.mkTell $ LocalLinkClicked $ fromMaybe NotFound $ hush $ parse routeCodec path
             Nothing -> pure unit
         Nothing -> pure unit
 
     addEventListener (EventType "click") listener false (toEventTarget body)
 
-  let
-    onUrlChange =
-      ( matchesWith
-          (parse routeCodec)
-          ( \old new -> do
-              when (old /= Just new) $ launchAff_ do
-                void $ halogenIO.query $ H.mkTell $ Navigate new
-          )
-          nav
-      )
-  void $ H.liftEffect onUrlChange
+  void $ H.liftEffect
+    ( matchesWith
+        (parse routeCodec)
+        ( \old new -> do
+            when (old /= Just new) $ launchAff_ do
+              void $ halogenIO.query $ H.mkTell $ Navigate new
+        )
+        nav
+    )
 

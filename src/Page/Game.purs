@@ -16,11 +16,9 @@ type State =
 initialState :: String -> State
 initialState game_id = { game_id }
 
-data Action
-  = NoOp
+data Action = NoOp
 
-data PageAction
-  = NavigateTo Route Event
+data PageAction = NavigateTo Route Event
 
 handleAction :: forall m. MonadEffect m => Action -> H.HalogenM State Action () PageAction m Unit
 handleAction NoOp = H.liftEffect do

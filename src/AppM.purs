@@ -24,5 +24,4 @@ derive newtype instance monadEffectAppM :: MonadEffect AppM
 derive newtype instance monadAffAppM :: MonadAff AppM
 
 instance navigateAppM :: Navigate AppM where
-  navigate nav route = liftEffect do
-    nav.pushState (unsafeToForeign {}) (print routeCodec route)
+  navigate nav route = liftEffect $ nav.pushState (unsafeToForeign {}) (print routeCodec route)
